@@ -14,9 +14,7 @@
       "description": "Comprehensive guide for WebGPU Three.js with TSL - covers renderer setup, node materials, compute shaders, post-processing, and WGSL integration",
       "source": "./",
       "strict": false,
-      "skills": [
-        "skills/webgpu-threejs-tsl"
-      ]
+      "skills": "skills/webgpu-threejs-tsl"
     }
   ]
 }
