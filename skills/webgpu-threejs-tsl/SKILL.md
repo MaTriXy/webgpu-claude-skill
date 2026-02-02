@@ -28,6 +28,7 @@ material.colorNode = color(0xff0000).mul(oscSine(time));
 - `docs/compute-shaders.md` - GPU compute with instanced arrays
 - `docs/post-processing.md` - Built-in and custom effects
 - `docs/wgsl-integration.md` - Custom WGSL functions
+- `docs/device-loss.md` - Handling GPU device loss and recovery
 
 ### Examples
 - `examples/basic-setup.js` - Minimal WebGPU project

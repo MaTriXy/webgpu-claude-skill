@@ -142,7 +142,7 @@ function createComputeShaders() {
     // Ground collision
     If(position.y.lessThan(0), () => {
       position.y.assign(0);
-      velocity.y.assign(velocity.y.abs().mul(bounce).negate().mul(-1));
+      velocity.y.assign(velocity.y.abs().mul(bounce)); // Reverse and dampen
 
       // Extra friction on ground
       velocity.x.mulAssign(0.9);

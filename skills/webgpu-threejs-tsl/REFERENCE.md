@@ -276,8 +276,60 @@ const gradient = mix(colorA, colorB, positionLocal.y.mul(0.5).add(0.5));
 | `LineBasicNodeMaterial` | Lines |
 | `SpriteNodeMaterial` | Sprites |
 
+## Device Loss Handling
+
+```javascript
+// Listen for device loss
+renderer.backend.device.lost.then((info) => {
+  if (info.reason === 'unknown') {
+    // Unexpected loss - recover
+    renderer.dispose();
+    initWebGPU();  // Reinitialize
+  }
+});
+
+// Simulate loss for testing
+renderer.backend.device.destroy();
+```
+
+| Loss Reason | Meaning |
+|-------------|---------|
+| `'destroyed'` | Intentional via `destroy()` |
+| `'unknown'` | Unexpected (driver crash, timeout, etc.) |
+
+**Recovery tips:**
+- Always get fresh adapter before new device
+- Save/restore application state (not transient data)
+- Use Chrome `about:gpucrash` to test real GPU crashes
+
+## Compute Shader Built-ins
+
+| Node | Description |
+|------|-------------|
+| `instanceIndex` | Current instance/invocation index |
+| `vertexIndex` | Current vertex index |
+| `drawIndex` | Current draw call index |
+| `globalId` | Global invocation position (uvec3) |
+| `localId` | Local workgroup position (uvec3) |
+| `workgroupId` | Workgroup index (uvec3) |
+| `numWorkgroups` | Number of workgroups dispatched (uvec3) |
+| `subgroupSize` | Size of the subgroup |
+
+## Version Notes
+
+**r178+:**
+- `PI2` is deprecated → use `TWO_PI`
+- `transformedNormalView` → use `normalView`
+- `transformedNormalWorld` → use `normalWorld`
+
+**r171+:**
+- Recommended minimum version for stable TSL
+- Requires separate `three/webgpu` import map entry
+
 ## Resources
 
 - [TSL Wiki](https://github.com/mrdoob/three.js/wiki/Three.js-Shading-Language)
+- [TSL Docs](https://threejs.org/docs/pages/TSL.html)
 - [WebGPU Examples](https://github.com/mrdoob/three.js/tree/master/examples)
 - [Three.js Docs](https://threejs.org/docs/)
+- [WebGPU Best Practices - Device Loss](https://toji.dev/webgpu-best-practices/device-loss)

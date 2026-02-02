@@ -39,7 +39,8 @@ skills/webgpu-threejs-tsl/
 │   ├── materials.md            # Node materials and properties
 │   ├── compute-shaders.md      # GPU compute documentation
 │   ├── post-processing.md      # Built-in and custom effects
-│   └── wgsl-integration.md     # Custom WGSL functions
+│   ├── wgsl-integration.md     # Custom WGSL functions
+│   └── device-loss.md          # GPU device loss handling and recovery
 ├── examples/
 │   ├── basic-setup.js          # Minimal WebGPU project
 │   ├── custom-material.js      # Custom shader material
@@ -83,6 +84,12 @@ skills/webgpu-threejs-tsl/
 - Hybrid TSL/WGSL approaches
 - Performance optimization
 
+### Device Loss Handling
+- Detecting GPU device loss
+- Recovery strategies
+- Testing with destroy() and Chrome GPU crash
+- State preservation and restoration
+
 ## Quick Example
 
 ```javascript
@@ -105,10 +112,22 @@ material.emissiveNode = Fn(() => {
 })();
 ```
 
+## Compatibility
+
+- **Recommended Three.js version**: r171+
+- **Target browsers**: Chrome 113+, Edge 113+, Firefox (behind flag), Safari (WebGPU preview)
+
+### Version Notes
+
+- **r178+**: `PI2` deprecated (use `TWO_PI`), `transformedNormalView/World` renamed to `normalView/World`
+- **r171+**: Stable TSL API, requires `three/webgpu` import map entry
+
 ## Resources
 
+- [Three.js TSL Documentation](https://threejs.org/docs/pages/TSL.html)
 - [Three.js Shading Language Wiki](https://github.com/mrdoob/three.js/wiki/Three.js-Shading-Language)
 - [Three.js WebGPU Examples](https://github.com/mrdoob/three.js/tree/master/examples)
+- [WebGPU Best Practices](https://toji.dev/webgpu-best-practices/)
 - [Agent Skills Specification](https://github.com/anthropics/skills)
 
 ## License

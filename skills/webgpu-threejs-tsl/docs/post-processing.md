@@ -275,19 +275,26 @@ postProcessing.outputNode = vignette();
 ### CRT/Scanline Effect
 
 ```javascript
+import { viewportSharedTexture } from 'three/tsl';
+
 const crtEffect = Fn(() => {
-  const color = scenePassColor.toVar();
   const uv = screenUV;
+
+  // Sample scene at offset UVs for RGB separation (chromatic aberration)
+  const uvR = uv.add(vec2(0.002, 0));
+  const uvG = uv;
+  const uvB = uv.sub(vec2(0.002, 0));
+
+  // Use viewportSharedTexture to sample at different UV coordinates
+  const r = viewportSharedTexture(uvR).r;
+  const g = viewportSharedTexture(uvG).g;
+  const b = viewportSharedTexture(uvB).b;
+
+  const color = vec4(r, g, b, 1.0).toVar();
 
   // Scanlines
   const scanline = uv.y.mul(screenSize.y).mul(0.5).sin().mul(0.1).add(0.9);
   color.rgb.mulAssign(scanline);
-
-  // Slight RGB offset
-  const r = texture(scenePassColor, uv.add(vec2(0.002, 0))).r;
-  const b = texture(scenePassColor, uv.sub(vec2(0.002, 0))).b;
-  color.r.assign(r);
-  color.b.assign(b);
 
   // Vignette
   const dist = uv.sub(0.5).length();
@@ -296,6 +303,7 @@ const crtEffect = Fn(() => {
   return color;
 });
 
+// Note: For this effect, apply after scene rendering
 postProcessing.outputNode = crtEffect();
 ```
 
@@ -363,6 +371,39 @@ const colorTexture = scenePass.getTextureNode('output');
 const normalTexture = scenePass.getTextureNode('normal');
 const depthTexture = scenePass.getTextureNode('depth');
 ```
+
+### Selective Bloom with MRT
+
+Bloom only emissive objects by rendering emissive to a separate target:
+
+```javascript
+import { pass, mrt, output, emissive } from 'three/tsl';
+import { bloom } from 'three/addons/tsl/display/BloomNode.js';
+
+const postProcessing = new THREE.PostProcessing(renderer);
+const scenePass = pass(scene, camera);
+
+// Render both color and emissive to separate targets
+scenePass.setMRT(mrt({
+  output: output,
+  emissive: emissive
+}));
+
+// Get the texture nodes
+const colorTexture = scenePass.getTextureNode('output');
+const emissiveTexture = scenePass.getTextureNode('emissive');
+
+// Apply bloom only to emissive
+const bloomPass = bloom(emissiveTexture);
+bloomPass.threshold.value = 0.0;  // Bloom all emissive
+bloomPass.strength.value = 1.5;
+bloomPass.radius.value = 0.5;
+
+// Combine: original color + bloomed emissive
+postProcessing.outputNode = colorTexture.add(bloomPass);
+```
+
+This approach prevents non-emissive bright areas (like white surfaces) from blooming.
 
 ## Chaining Effects
 
